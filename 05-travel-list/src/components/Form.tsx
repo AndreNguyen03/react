@@ -1,9 +1,15 @@
 import { useState } from "react";
+import type { ItemType } from "../types";
 
-const Form = () => {
+interface FormProps {
+    onAddItems: (item: ItemType) => void
+}
+
+const Form: React.FC<FormProps> = ({ onAddItems }) => {
 
     const [description, setDescription] = useState<string>("");
     const [quantity, setQuantity] = useState<number>(1);
+
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -12,6 +18,11 @@ const Form = () => {
             alert("Please enter an item description");
             return;
         }
+
+        const newItem = { description, quantity, packed: false, id: Date.now() };
+        console.log(newItem);
+
+        onAddItems(newItem);
 
         setDescription("");
         setQuantity(1);
