@@ -1,6 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { DetailMovie, Movie, WatchedMovie } from "./types";
 import StarRating from "./StarRating";
+import { useMovies } from "./hooks/use-movies";
+import { useLocalStorageState } from "./hooks/use-local-storage";
+import { useKey } from "./hooks/use-key";
 
 // const tempMovieData = [
 //     {
@@ -52,74 +55,32 @@ import StarRating from "./StarRating";
 const average = (arr: number[]) =>
     arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
-const apiKey = import.meta.env.VITE_REACT_APP_MOVIES_API_KEY;
 const tempQuery = 'interstellar'
+const apiKey = import.meta.env.VITE_REACT_APP_MOVIES_API_KEY;
 
 export default function App() {
     const [query, setQuery] = useState<string>(tempQuery);
-    const [movies, setMovies] = useState<Movie[]>([]);
-    const [watched, setWatched] = useState<WatchedMovie[]>([]);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [error, setError] = useState<string>('');
     const [selectedMovieId, setSelectedMovieId] = useState<string | null>(null);
-
-    const handleSelectMovie = (movieId: string) => {
-        setSelectedMovieId((currMovieId) => (movieId === currMovieId ? null : movieId));
-    }
 
     const handleCloseMovie = () => {
         setSelectedMovieId(null);
     }
 
+    const { movies, isLoading, error } = useMovies({ query, callback: handleCloseMovie })
+
+    const [watched, setWatched] = useLocalStorageState([], "watched");
+
+    const handleSelectMovie = (movieId: string) => {
+        setSelectedMovieId((currMovieId) => (movieId === currMovieId ? null : movieId));
+    }
+
     const handleAddWatchedMovie = (movie: WatchedMovie) => {
-        setWatched(currWatched => [...currWatched, movie])
+        setWatched((currWatched: WatchedMovie[]) => [...currWatched, movie])
     }
 
     const handleDeleteWatchedMovie = (watchId: string) => {
-        setWatched(currWatched => currWatched.filter(watched => watched.imdbID === watchId))
+        setWatched((currWatched: WatchedMovie[]) => currWatched.filter(watched => watched.imdbID === watchId))
     }
-
-
-
-    useEffect(() => {
-        const controller = new AbortController();
-
-        const fetchMovies = async () => {
-            try {
-                setIsLoading(true);
-                setError('');
-                const res = await fetch(`http://www.omdbapi.com/?apikey=${apiKey}&s=${query}`,
-                    { signal: controller.signal });
-
-                if (!res.ok) throw new Error('Something went wrong with fetching movies');
-
-                const data = await res.json();
-                if (data.Response === "False") throw new Error('Movies not found');
-
-                setMovies(data.Search);
-                setError('');
-            } catch (error) {
-                if ((error as Error).name !== "AbortError")
-                    setError((error as Error).message)
-            } finally {
-                setIsLoading(false);
-            }
-        }
-
-        if (query.length < 3) {
-            setMovies([]);
-            setError('');
-            return;
-        }
-
-        handleCloseMovie();
-        fetchMovies();
-
-        return () => {
-            controller.abort();
-        }
-    }, [query])
-
 
     return (
         <>
@@ -216,6 +177,17 @@ interface SearchProps {
 
 const Search: React.FC<SearchProps> = ({ query, setQuery }) => {
 
+    const inputEl = useRef<HTMLInputElement | null>(null);
+
+    useKey('Enter', () => {
+        if (document.activeElement === inputEl.current) return;
+        if (inputEl.current) {
+            inputEl.current.focus();
+            setQuery('');
+        }
+    })
+
+
     return (
         <input
             className="search"
@@ -223,6 +195,7 @@ const Search: React.FC<SearchProps> = ({ query, setQuery }) => {
             placeholder="Search movies..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
+            ref={inputEl}
         />
     )
 }
@@ -299,23 +272,16 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ selectedId, watched, onClos
     const [error, setError] = useState<string>('');
     const [rating, setRating] = useState<number>(0);
 
+    const countRef = useRef<number>(0);
+
+    useEffect(() => {
+        if (rating) countRef.current++;
+    }, [rating])
+
     const isWatched = watched.map(watched => watched.imdbID).includes(selectedId);
     const watchedRating = watched.find(watched => watched.imdbID === selectedId)?.userRating;
 
-    useEffect(() => {
-        const callback = (e: KeyboardEvent) => {
-            if (e.code === 'Escape') {
-                onCloseMovie();
-                // console.log('CLOSING')
-            }
-        }
-
-        document.addEventListener('keydown', callback)
-
-        return () => {
-            document.removeEventListener('keydown', callback);
-        }
-    }, [onCloseMovie])
+    useKey('Escape', onCloseMovie);
 
     useEffect(() => {
         const changeTitle = () => {
