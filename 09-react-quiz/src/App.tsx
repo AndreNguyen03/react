@@ -1,15 +1,6 @@
 import { useEffect, useReducer } from "react"
-import Header from "./Header"
-import Main from "./Main"
-import Loader from "./Loader";
-import ErrorComponent from "./ErrorComponent";
-import StartScreen from "./StartScreen";
-import Question from "./Question";
-import NextButton from "./components/NextButton";
-import Progress from "./components/Progress";
-import FinishScreen from "./components/FinishScreen";
-import Footer from "./components/Footer";
-import Timer from "./components/Timer";
+import { ErrorComponent, Header, Loader, Main, Progress, StartScreen, Question, Footer, Timer, NextButton, FinishScreen } from "./components";
+
 
 export type Question = {
     question: string;
@@ -56,7 +47,7 @@ function reducer(state: State, action: Action): State {
         case 'dataFailed':
             return { ...state, status: 'error' };
         case 'start':
-            return { ...state, status: 'active', secondsRemaining: state.questions.length * SECS_PER_QUESTION};
+            return { ...state, status: 'active', secondsRemaining: state.questions.length * SECS_PER_QUESTION };
         case 'newAnswer': {
             const question = state.questions[state.index];
 
@@ -70,7 +61,7 @@ function reducer(state: State, action: Action): State {
             console.log('State trước khi restart:', state);
             return { ...initialState, status: 'ready', questions: state.questions };
         case 'tick':
-            return { ...state, secondsRemaining: state.secondsRemaining! - 1 , status: state.secondsRemaining === 0 ? 'finished' : state.status };
+            return { ...state, secondsRemaining: state.secondsRemaining! - 1, status: state.secondsRemaining === 0 ? 'finished' : state.status };
         default:
             throw new Error('Unknown action type');
     }

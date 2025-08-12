@@ -1,4 +1,4 @@
-import type { Action } from "./App";
+import type { Action } from "../App";
 
 export default function StartScreen({numQuestions, dispatch} : {numQuestions: number, dispatch: React.Dispatch<Action>}) {
   return (

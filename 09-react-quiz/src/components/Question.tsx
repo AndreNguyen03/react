@@ -1,5 +1,5 @@
-import type { Action, Question } from "./App";
-import Options from "./components/Options";
+import type { Action, Question } from "../App";
+import Options from "./Options";
 
 export default function Question({ question, dispatch, answerIndex }: { question: Question, dispatch: React.Dispatch<Action>, answerIndex: number | null }) {
     return (
