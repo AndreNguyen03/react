@@ -1,9 +1,13 @@
-import { useParams, useSearchParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import styles from "./City.module.css";
+import { useCities } from "../hooks";
+import { useEffect } from "react";
+import { Spinner } from "./Spinner";
+import { BackButton } from "./";
 
 const formatDate = (date: string | null) => {
   if (!date) return null;
-  new Intl.DateTimeFormat("en", {
+  return new Intl.DateTimeFormat("en", {
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -12,24 +16,15 @@ const formatDate = (date: string | null) => {
 }
 
 export function City() {
-  // TEMP DATA
-  const currentCity = {
-    cityName: "Lisbon",
-    emoji: "🇵🇹",
-    date: "2027-10-31T15:59:59.138Z",
-    notes: "My favorite city so far!",
-  };
-
   const { id } = useParams();
+  const { getCityById, currentCity, isLoading } = useCities()
+  const { cityName, emoji, date, notes } = currentCity || {};
 
+  useEffect(() => {
+    getCityById(id || "");
+  }, [id]);
 
-  const [searchParams, setSearchParams] = useSearchParams();
-  const lat = searchParams.get('lat');
-  const lng = searchParams.get('lng');
-
-  const { cityName, emoji, date, notes } = currentCity;
-
-  return <h1>City {id} <p>Position: {lat}, {lng}</p></h1>
+  if (isLoading) return <Spinner />
 
   return (
     <div className={styles.city}>
@@ -64,7 +59,7 @@ export function City() {
       </div>
 
       <div>
-        {/* <ButtonBack /> */}
+        <BackButton />
       </div>
     </div>
   );
