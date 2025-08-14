@@ -1,6 +1,6 @@
 import styles from "./Message.module.css";
 
-export function Message({ message }) {
+export function Message({ message }: { message: string }) {
   return (
     <p className={styles.message}>
       <span role="img">👋</span> {message}

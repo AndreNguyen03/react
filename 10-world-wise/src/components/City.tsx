@@ -22,7 +22,7 @@ export function City() {
 
   useEffect(() => {
     getCityById(id || "");
-  }, [id]);
+  }, [id, getCityById]);
 
   if (isLoading) return <Spinner />
 

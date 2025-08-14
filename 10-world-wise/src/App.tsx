@@ -3,6 +3,15 @@ import { AppLayout, Homepage, Login, PageNotFound, Pricing, Product, ProtectedRo
 import { City, CityList, CountryList, Form } from "./components";
 import { AuthProvider, CitiesProvider } from "./contexts";
 
+// import { lazy, Suspensse } from 'react';
+
+// const AppLayout = lazy(() => import('./pages/AppLayout'))
+
+
+// dist/index.html                   0.45 kB │ gzip:   0.29 kB
+// dist/assets/index-BB-66-7r.css   30.27 kB │ gzip:   5.06 kB
+// dist/assets/index-CsuTzFPq.js   560.64 kB │ gzip: 165.77 kB
+
 export function App() {
     return (
         <AuthProvider>

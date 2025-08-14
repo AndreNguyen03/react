@@ -1,4 +1,4 @@
-import { createContext, useEffect, useReducer } from "react";
+import { createContext, useCallback, useEffect, useReducer } from "react";
 import type { CityType } from "../types.ts";
 
 type CitiesContextType = {
@@ -91,7 +91,7 @@ function CitiesProvider({ children }: { children: React.ReactNode }) {
         fetchCities();
     }, [])
 
-    async function getCityById(id: string) {
+    const getCityById = useCallback(async function (id: string) {
         if (id === currentCity?.id) return;
 
         try {
@@ -102,7 +102,7 @@ function CitiesProvider({ children }: { children: React.ReactNode }) {
         } catch (error) {
             dispatch({ type: 'rejected', payload: (error as Error).message })
         }
-    }
+    }, [currentCity?.id])
 
     async function createCity(newCity: CityType) {
         try {
