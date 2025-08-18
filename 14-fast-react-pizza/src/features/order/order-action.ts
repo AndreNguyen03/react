@@ -2,6 +2,8 @@ import { redirect, type ActionFunctionArgs } from 'react-router-dom'
 import { createOrder } from '../../services'
 import { isValidPhone } from '../../utils'
 import type { CartItemType } from '../../types'
+import { store } from '../../store'
+import { clearCart } from '../cart/cart.slice'
 
 async function action({ request }: ActionFunctionArgs) {
 	const formData = await request.formData()
@@ -10,9 +12,11 @@ async function action({ request }: ActionFunctionArgs) {
 		address: formData.get('address') as string,
 		customer: formData.get('customer') as string,
 		phone: formData.get('phone') as string,
-		priority: formData.get('priority') === 'on',
+		priority: formData.get('priority') as string === 'on',
 		cart: JSON.parse(formData.get('cart') as string)
 	}
+
+    console.log(order)
 
 	const errors: { address?: string; customer?: string; phone?: string; priority?: boolean; cart?: CartItemType[] } =
 		{}
@@ -24,8 +28,9 @@ async function action({ request }: ActionFunctionArgs) {
 
 	const newOrder = await createOrder(order)
 
+    store.dispatch(clearCart())
+
 	return redirect(`/order/${newOrder.id}`)
-	return null
 }
 
 export { action }

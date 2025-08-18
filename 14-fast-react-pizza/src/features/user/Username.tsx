@@ -1,5 +1,11 @@
+import { useAppSelector } from '../../store'
+
 function Username() {
-	return <p className='hidden text-sm font-semibold md:block'>ngoc anh dep trai me say dam gia phuc xinh gai</p>
+	const username = useAppSelector((state) => state.user.username)
+
+	if (!username) return null
+
+	return <p className='hidden text-sm font-semibold md:block'>{username}</p>
 }
 
 export { Username }

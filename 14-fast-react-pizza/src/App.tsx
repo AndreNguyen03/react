@@ -6,6 +6,9 @@ import { CreateOrder, Order } from './features/order'
 import { loader as menuLoader } from './features/menu/menu-loader'
 import { loader as orderLoader } from './features/order/order-loader'
 import { action as createOrderAction } from './features/order/order-action'
+import { action as updateOrderAction } from './features/order/update-order-action'
+import { Provider } from 'react-redux'
+import { store } from './store'
 
 const router = createBrowserRouter([
 	{
@@ -16,13 +19,23 @@ const router = createBrowserRouter([
 			{ path: '/menu', element: <Menu />, loader: menuLoader, errorElement: <Error /> },
 			{ path: '/cart', element: <Cart /> },
 			{ path: '/order/new', element: <CreateOrder />, action: createOrderAction },
-			{ path: '/order/:orderId', element: <Order />, loader: orderLoader, errorElement: <Error /> }
+			{
+				path: '/order/:orderId',
+				element: <Order />,
+				loader: orderLoader,
+				errorElement: <Error />,
+				action: updateOrderAction
+			}
 		]
 	}
 ])
 
 function App() {
-	return <RouterProvider router={router} />
+	return (
+		<Provider store={store}>
+			<RouterProvider router={router} />
+		</Provider>
+	)
 }
 
 export { App }

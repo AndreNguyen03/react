@@ -1,12 +1,20 @@
 // Test ID: IIDSAT
 
-import { useLoaderData } from 'react-router-dom'
+import { useFetcher, useLoaderData } from 'react-router-dom'
 import { calcMinutesLeft, formatCurrency, formatDate } from '../../utils/helpers'
-import type { OrderType } from '../../types'
+import type { OrderType, Pizza } from '../../types'
 import { OrderItem } from './'
+import { useEffect } from 'react'
+import { UpdateOrder } from './UpdateOrder'
 
 function Order() {
 	const order: OrderType = useLoaderData()
+	const fetcher = useFetcher()
+
+	useEffect(() => {
+		if (!fetcher.data && fetcher.state === 'idle') fetcher.load('/menu')
+	}, [fetcher])
+
 	// Everyone can search for all orders, so for privacy reasons we're gonna gonna exclude names or address, these are only for the restaurant staff
 	const { id, status, priority, priorityPrice, orderPrice, estimatedDelivery, cart } = order
 	const deliveryIn = calcMinutesLeft(estimatedDelivery)
@@ -37,11 +45,18 @@ function Order() {
 				<p className='text-xs text-stone-500'>(Estimated delivery: {formatDate(estimatedDelivery)})</p>
 			</div>
 
-            <ul className='divide-stone-200 divide-y border-b border-t'>
-                {cart.map(item => {
-                    return <OrderItem item={item} key={item.pizzaId} />
-                })}
-            </ul>
+			<ul className='divide-y divide-stone-200 border-b border-t'>
+				{cart.map((item) => {
+					return (
+						<OrderItem
+							item={item}
+							key={item.pizzaId}
+							ingredients={fetcher?.data?.find((el: Pizza) => el.id === item.pizzaId)?.ingredients ?? []}
+							isLoadingIngredients={fetcher.state === 'loading'}
+						/>
+					)
+				})}
+			</ul>
 
 			<div className='space-y-2 bg-stone-200 px-6 py-5'>
 				<p className='text-sm font-medium text-stone-600'>Price pizza: {formatCurrency(orderPrice)}</p>
@@ -52,6 +67,7 @@ function Order() {
 				)}
 				<p className='font-bold'>To pay on delivery: {formatCurrency(orderPrice + priorityPrice)}</p>
 			</div>
+			{!priority && <UpdateOrder />}
 		</div>
 	)
 }

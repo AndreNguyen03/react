@@ -1,9 +1,13 @@
+import { useAppSelector } from '../../store'
 import type { CartItemType } from '../../types'
-import { Button } from '../../ui'
 import { formatCurrency } from '../../utils'
+import { getCurrentQuantityById } from './cart.slice'
+import { DeleteItem } from './DeleteItem'
+import { UpdateItemQuantity } from './UpdateItemQuantity'
 
 function CartItem({ item }: { item: CartItemType }) {
-	const { name, quantity, totalPrice } = item
+	const { pizzaId, name, quantity, totalPrice } = item
+    const currentQuantity = useAppSelector(getCurrentQuantityById(pizzaId))
 
 	return (
 		<li className='py-3 sm:flex sm:items-center sm:justify-between'>
@@ -12,7 +16,8 @@ function CartItem({ item }: { item: CartItemType }) {
 			</p>
 			<div className='flex items-center justify-between sm:gap-6'>
 				<p className='text-sm font-bold'>{formatCurrency(totalPrice)}</p>
-				<Button type='small'>Delete</Button>
+                <UpdateItemQuantity pizzaId={pizzaId} currentQuantity={currentQuantity}/>
+				<DeleteItem pizzaId={pizzaId} />
 			</div>
 		</li>
 	)
