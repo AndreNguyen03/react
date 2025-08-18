@@ -1,20 +1,19 @@
-import { useLoaderData } from "react-router-dom";
-import type { Pizza } from "../../types";
-import { MenuItem } from "./MenuItem";
+import { useLoaderData } from 'react-router-dom'
+import type { Pizza } from '../../types'
+import { MenuItem } from './MenuItem'
 
 function Menu() {
-    const menu = useLoaderData()
+	const menu = useLoaderData()
 
-    return (
-        <>
-            <h1>Menu</h1>
-            <ul>
-                {menu.map((pizza: Pizza) => {
-                    return <MenuItem pizza={pizza} key={pizza.id} />
-                })}
-            </ul>
-        </>
-    )
+	return (
+		<>
+			<ul className='divide-y divide-stone-200 px-2'>
+				{menu.map((pizza: Pizza) => {
+					return <MenuItem pizza={pizza} key={pizza.id} />
+				})}
+			</ul>
+		</>
+	)
 }
 
-export { Menu };
+export { Menu }

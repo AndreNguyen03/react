@@ -28,6 +28,14 @@ type Pizza = {
     imageUrl: string
 }
 
+type OrderData =  {
+  address: string;
+  cart: CartItemType[];
+  customer: string;
+  phone: string;
+  priority: boolean;
+}
+
 type ErrorResponse = {
     data?: string,
     error?: {
@@ -38,4 +46,4 @@ type ErrorResponse = {
     status?: number,
     statusText?: string
 }
-export type { CartItemType, OrderType, Pizza, ErrorResponse }
+export type { CartItemType, OrderType, Pizza, ErrorResponse, OrderData }
